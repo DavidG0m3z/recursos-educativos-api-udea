@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Resource } from './resources/entities/resource.entity';  
+import { ComplexityRef } from './resources/entities/comprexity-ref.entity'; 
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { AppService } from './app.service';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [Resource, ComplexityRef],
         synchronize: true,
       }),
     }),
