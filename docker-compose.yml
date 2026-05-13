@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: recursos_educativos_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: recursos_educativos
+      MYSQL_USER: recursos_user
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3307:3306"
+    volumes:
+      - recursos_db_data:/var/lib/mysql
+volumes:
+  recursos_db_data:
