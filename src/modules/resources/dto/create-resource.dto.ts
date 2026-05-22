@@ -1,35 +1,41 @@
 import {
   IsArray,
   IsBoolean,
+  IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ResourceRolesDto } from './resource-roles.dto';
 import { ComplexityRefDto } from './complexity-ref.dto';
 
 export class CreateResourceDto {
-  @IsString()
-  category: string;
+
+ @IsString()
+  @IsNotEmpty()
+  title!: string;
 
   @IsString()
-  type: string;
-
-  @IsString()
-  description: string;
+  @IsNotEmpty()
+  description!: string;
 
   @IsOptional()
   @IsBoolean()
   hidden?: boolean;
 
-  @ValidateNested()
-  @Type(() => ResourceRolesDto)
-  roles: ResourceRolesDto;
+  // IDs de las categorías a asociar
+  @IsOptional()
+  @IsArray()
+  categoryIds?: number[];
+
+  // IDs de los cargos a asociar
+  @IsOptional()
+  @IsArray()
+  cargoIds?: number[];
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ComplexityRefDto)
-  complexity?: ComplexityRefDto[];
+  complexityRefs?: ComplexityRefDto[];
 }
