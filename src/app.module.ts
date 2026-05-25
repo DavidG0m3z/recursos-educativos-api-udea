@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { Resource } from './resources/entities/resource.entity';  
-import { ComplexityRef } from './resources/entities/comprexity-ref.entity'; 
+import { ResourcesModule } from './modules/resources/resources.module';
+import { CategoriesModule } from './modules/categories/categories.modules';
+import { PositionModule } from './modules/position/position.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { UsersModule } from './modules/users/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,12 +22,15 @@ import { ComplexityRef } from './resources/entities/comprexity-ref.entity';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [Resource, ComplexityRef],
+        entities: [__dirname + '/modules/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
     }),
+    ResourcesModule,
+    CategoriesModule,
+    PositionModule,
+    RolesModule,
+    UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

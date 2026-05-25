@@ -1,29 +1,23 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Resource } from './resource.entity';
-
 
 @Entity('complexity_refs')
 export class ComplexityRef {
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: 'int' })
-  level: number;
+  level!: number;
 
   @Column({ type: 'text', nullable: true })
-  desc: string;
+  description!: string;
 
   @Column({ type: 'text', nullable: true })
-  link: string;
+  link!: string;
 
-  @ManyToOne(() => Resource, (resource) => resource.complexity, {
+  @ManyToOne(() => Resource, (resource) => resource.complexityRefs, {
     onDelete: 'CASCADE',
   })
-  resource: Resource;
+  resource!: Resource;
 }
