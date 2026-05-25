@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { RolesSeederService } from './roles-seeder.service';
+import { RolesSeederService } from './roles--seeder.service';
 
 
 @Module({

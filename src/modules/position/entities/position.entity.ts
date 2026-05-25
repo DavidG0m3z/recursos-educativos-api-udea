@@ -2,7 +2,7 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Resource } from '../../resources/entities/resource.entity';
 import { Participation } from '../../../common/enums/participation.enum';
 
-@Entity('cargos')
+@Entity('positions')
 export class Position {
 
   @PrimaryGeneratedColumn()

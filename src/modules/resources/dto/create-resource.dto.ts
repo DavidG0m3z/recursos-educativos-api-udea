@@ -31,7 +31,7 @@ export class CreateResourceDto {
   // IDs de los cargos a asociar
   @IsOptional()
   @IsArray()
-  cargoIds?: number[];
+  positionIds?: number[];
 
   @IsOptional()
   @IsArray()

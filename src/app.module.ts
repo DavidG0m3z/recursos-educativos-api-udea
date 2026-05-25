@@ -2,17 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResourcesModule } from './modules/resources/resources.module';
-import { CategoriesModule } from './modules/categories/categories.module';
-import { CargosModule } from './modules/cargos/cargos.module';
+import { CategoriesModule } from './modules/categories/categories.modules';
+import { PositionModule } from './modules/position/position.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { UsersModule } from './modules/users/users.module';
+import { UsersModule } from './modules/users/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -27,11 +26,9 @@ import { UsersModule } from './modules/users/users.module';
         synchronize: true,
       }),
     }),
-
-    // Módulos de dominio
     ResourcesModule,
     CategoriesModule,
-    CargosModule,
+    PositionModule,
     RolesModule,
     UsersModule,
   ],

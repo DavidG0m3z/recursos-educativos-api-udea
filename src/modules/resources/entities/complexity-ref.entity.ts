@@ -16,8 +16,6 @@ export class ComplexityRef {
   @Column({ type: 'text', nullable: true })
   link!: string;
 
-  // N:1 — muchos complexity_refs pertenecen a un resource
-  // onDelete CASCADE: si se borra el resource, se borran sus refs
   @ManyToOne(() => Resource, (resource) => resource.complexityRefs, {
     onDelete: 'CASCADE',
   })
