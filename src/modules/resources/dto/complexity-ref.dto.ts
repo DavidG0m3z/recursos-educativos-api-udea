@@ -6,7 +6,7 @@ export class ComplexityRefDto {
 
     @IsOptional()
     @IsString()
-    desc?: string;
+    description?: string;
 
     @IsOptional()
     @IsUrl()
