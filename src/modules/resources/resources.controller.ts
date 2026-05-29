@@ -5,7 +5,6 @@ import {
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
-import { Public } from '../auth/decorators/public.decorators';
 import { Roles } from '../auth/decorators/roles.decorators';
 import { RoleEnum } from '../../common/enums/role.enum';
 
@@ -20,13 +19,13 @@ export class ResourcesController {
     return this.resourcesService.create(createResourceDto);
   }
 
-  @Public()
+  @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Get()
   findAll() {
     return this.resourcesService.findAll();
   }
 
-  @Public()
+  @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.resourcesService.findOne(id);

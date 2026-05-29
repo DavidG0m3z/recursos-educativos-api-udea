@@ -161,7 +161,7 @@ La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles p
 
 | Método | Acceso requerido |
 |---|---|
-| `GET` | Público — no requiere token |
+| `GET` | Token con rol `admin` o `user` |
 | `POST` | Token con rol `admin` |
 | `PATCH` | Token con rol `admin` |
 | `DELETE` | Token con rol `admin` |
@@ -185,7 +185,7 @@ La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles p
 
 La URL base es `http://localhost:3000`.
 
-Los endpoints marcados con 🔒 requieren token con rol `admin` en el header:
+Los endpoints marcados con 🔒 requieren token con rol `admin` o `user` en el header:
 ```
 Authorization: Bearer <token>
 ```
@@ -196,7 +196,7 @@ Los endpoints marcados con 🌐 son públicos y no requieren token.
 
 ### Auth
 
-#### Registro de usuario
+#### Registro de usuario 🔒
 ```
 POST /auth/register
 ```
@@ -280,7 +280,7 @@ POST /categories
 
 ---
 
-#### Obtener todas las categorías 🌐
+#### Obtener todas las categorías 🔒
 ```
 GET /categories
 ```
@@ -297,7 +297,7 @@ GET /categories
 
 ---
 
-#### Obtener una categoría por id 🌐
+#### Obtener una categoría por id 🔒
 ```
 GET /categories/:id
 ```
@@ -368,7 +368,7 @@ POST /position
 
 ---
 
-#### Obtener todos los positions 🌐
+#### Obtener todos los positions 🔒
 ```
 GET /position
 ```
@@ -385,7 +385,7 @@ GET /position
 
 ---
 
-#### Obtener un position por id 🌐
+#### Obtener un position por id 🔒
 ```
 GET /position/:id
 ```
@@ -601,7 +601,7 @@ POST /resources
 
 ---
 
-#### Obtener todos los recursos 🌐
+#### Obtener todos los recursos 🔒
 ```
 GET /resources
 ```
@@ -611,7 +611,7 @@ GET /resources
 
 ---
 
-#### Obtener un recurso por id 🌐
+#### Obtener un recurso por id 🔒
 ```
 GET /resources/:id
 ```
