@@ -1,105 +1,3 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-
-
-## information of Project and endpoints
-
 # Recursos Educativos — Backend
 
 API REST desarrollada con **NestJS**, **TypeORM** y **MariaDB** para el Repositorio de Recursos Educomunicativos de Ude@ Educación Virtual — Universidad de Antioquia.
@@ -140,6 +38,8 @@ DB_PORT=3307
 DB_USERNAME=root
 DB_PASSWORD=tu_contraseña
 DB_NAME=recursos_educativos
+JWT_SECRET=supersecretkey_udea_2026
+JWT_EXPIRES_IN=24h
 ```
 
 ### 4. Levantar la base de datos
@@ -179,8 +79,23 @@ La API estará disponible en `http://localhost:3000`.
 src/
 ├── common/
 │   └── enums/
-│       └── participation.enum.ts
+│       ├── participation.enum.ts
+│       └── role.enum.ts
 ├── modules/
+│   ├── auth/
+│   │   ├── decorators/
+│   │   │   ├── public.decorator.ts
+│   │   │   └── roles.decorator.ts
+│   │   ├── dto/
+│   │   │   └── login.dto.ts
+│   │   ├── guards/
+│   │   │   ├── jwt-auth.guard.ts
+│   │   │   └── roles.guard.ts
+│   │   ├── strategies/
+│   │   │   └── jwt.strategy.ts
+│   │   ├── auth.controller.ts
+│   │   ├── auth.module.ts
+│   │   └── auth.service.ts
 │   ├── categories/
 │   │   ├── dto/
 │   │   ├── entities/
@@ -231,15 +146,119 @@ El proyecto usa **MariaDB 10.11** via Docker. Las tablas se crean automáticamen
 
 ---
 
+## Autenticación y autorización
+
+La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles para autorización.
+
+### Roles
+
+| Rol | Descripción |
+|---|---|
+| `admin` | Lectura y escritura — acceso total |
+| `user` | Solo lectura — acceso a endpoints GET |
+
+### Permisos por método HTTP
+
+| Método | Acceso requerido |
+|---|---|
+| `GET` | Público — no requiere token |
+| `POST` | Token con rol `admin` |
+| `PATCH` | Token con rol `admin` |
+| `DELETE` | Token con rol `admin` |
+
+### Cómo usar el token en Postman
+
+1. Hacer login en `POST /auth/login` y copiar el `access_token`
+2. En cada request protegido ir a **Authorization → Bearer Token**
+3. Pegar el token en el campo **Token**
+
+### Códigos de error de autenticación
+
+| Código | Descripción |
+|---|---|
+| `401 Unauthorized` | Token ausente o inválido |
+| `403 Forbidden` | Token válido pero rol insuficiente |
+
+---
+
 ## Endpoints
 
 La URL base es `http://localhost:3000`.
+
+Los endpoints marcados con 🔒 requieren token con rol `admin` en el header:
+```
+Authorization: Bearer <token>
+```
+
+Los endpoints marcados con 🌐 son públicos y no requieren token.
+
+---
+
+### Auth
+
+#### Registro de usuario
+```
+POST /auth/register
+```
+> Endpoint para crear el primer usuario administrador. No requiere token.
+
+**Body:**
+```json
+{
+    "name": "Admin Ude@",
+    "email": "admin@udea.edu.co",
+    "password": "12345678",
+    "roleId": 1
+}
+```
+> `roleId`: `1` = admin, `2` = user
+
+**Respuesta `201`:**
+```json
+{
+    "id": 1,
+    "name": "Admin Ude@",
+    "email": "admin@udea.edu.co",
+    "password": "$2b$10$...",
+    "createdAt": "2026-05-29T00:12:57.419Z",
+    "role": {
+        "id": 1,
+        "name": "admin"
+    }
+}
+```
+
+---
+
+#### Login 🌐
+```
+POST /auth/login
+```
+**Body:**
+```json
+{
+    "email": "admin@udea.edu.co",
+    "password": "12345678"
+}
+```
+**Respuesta `200`:**
+```json
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "name": "Admin Ude@",
+        "email": "admin@udea.edu.co",
+        "role": "admin"
+    }
+}
+```
 
 ---
 
 ### Categories
 
-#### Crear categoría
+#### Crear categoría 🔒
 ```
 POST /categories
 ```
@@ -261,7 +280,7 @@ POST /categories
 
 ---
 
-#### Obtener todas las categorías
+#### Obtener todas las categorías 🌐
 ```
 GET /categories
 ```
@@ -278,7 +297,7 @@ GET /categories
 
 ---
 
-#### Obtener una categoría por id
+#### Obtener una categoría por id 🌐
 ```
 GET /categories/:id
 ```
@@ -293,7 +312,7 @@ GET /categories/:id
 
 ---
 
-#### Actualizar una categoría
+#### Actualizar una categoría 🔒
 ```
 PATCH /categories/:id
 ```
@@ -315,7 +334,7 @@ PATCH /categories/:id
 
 ---
 
-#### Eliminar una categoría
+#### Eliminar una categoría 🔒
 ```
 DELETE /categories/:id
 ```
@@ -327,7 +346,7 @@ DELETE /categories/:id
 
 Los valores válidos para `participation` son: `Si`, `No`, `Depende`.
 
-#### Crear position
+#### Crear position 🔒
 ```
 POST /position
 ```
@@ -349,7 +368,7 @@ POST /position
 
 ---
 
-#### Obtener todos los positions
+#### Obtener todos los positions 🌐
 ```
 GET /position
 ```
@@ -366,7 +385,7 @@ GET /position
 
 ---
 
-#### Obtener un position por id
+#### Obtener un position por id 🌐
 ```
 GET /position/:id
 ```
@@ -381,7 +400,7 @@ GET /position/:id
 
 ---
 
-#### Actualizar un position
+#### Actualizar un position 🔒
 ```
 PATCH /position/:id
 ```
@@ -403,7 +422,7 @@ PATCH /position/:id
 
 ---
 
-#### Eliminar un position
+#### Eliminar un position 🔒
 ```
 DELETE /position/:id
 ```
@@ -413,7 +432,7 @@ DELETE /position/:id
 
 ### Users
 
-#### Crear usuario
+#### Crear usuario 🔒
 ```
 POST /users
 ```
@@ -434,7 +453,7 @@ POST /users
     "id": 1,
     "name": "Jhon Doe",
     "email": "jhondoe@udea.edu.co",
-    "password": "12345678",
+    "password": "$2b$10$...",
     "createdAt": "2026-05-26T19:48:08.849Z",
     "role": {
         "id": 1,
@@ -445,7 +464,7 @@ POST /users
 
 ---
 
-#### Obtener todos los usuarios
+#### Obtener todos los usuarios 🔒
 ```
 GET /users
 ```
@@ -467,7 +486,7 @@ GET /users
 
 ---
 
-#### Obtener un usuario por id
+#### Obtener un usuario por id 🔒
 ```
 GET /users/:id
 ```
@@ -487,7 +506,7 @@ GET /users/:id
 
 ---
 
-#### Actualizar un usuario
+#### Actualizar un usuario 🔒
 ```
 PATCH /users/:id
 ```
@@ -514,7 +533,7 @@ PATCH /users/:id
 
 ---
 
-#### Eliminar un usuario
+#### Eliminar un usuario 🔒
 ```
 DELETE /users/:id
 ```
@@ -524,7 +543,7 @@ DELETE /users/:id
 
 ### Resources
 
-#### Crear recurso
+#### Crear recurso 🔒
 ```
 POST /resources
 ```
@@ -582,7 +601,7 @@ POST /resources
 
 ---
 
-#### Obtener todos los recursos
+#### Obtener todos los recursos 🌐
 ```
 GET /resources
 ```
@@ -592,7 +611,7 @@ GET /resources
 
 ---
 
-#### Obtener un recurso por id
+#### Obtener un recurso por id 🌐
 ```
 GET /resources/:id
 ```
@@ -600,7 +619,7 @@ GET /resources/:id
 
 ---
 
-#### Actualizar un recurso
+#### Actualizar un recurso 🔒
 ```
 PATCH /resources/:id
 ```
@@ -617,7 +636,7 @@ PATCH /resources/:id
 
 ---
 
-#### Eliminar un recurso (soft delete)
+#### Eliminar un recurso (soft delete) 🔒
 ```
 DELETE /resources/:id
 ```
@@ -627,7 +646,7 @@ DELETE /resources/:id
 
 ---
 
-#### Restaurar un recurso eliminado
+#### Restaurar un recurso eliminado 🔒
 ```
 PATCH /resources/:id/restore
 ```
@@ -637,7 +656,7 @@ PATCH /resources/:id/restore
 
 ---
 
-#### Alternar visibilidad de un recurso
+#### Alternar visibilidad de un recurso 🔒
 ```
 PATCH /resources/:id/visibility
 ```
@@ -655,6 +674,8 @@ PATCH /resources/:id/visibility
 | `201` | Created — recurso creado |
 | `204` | No Content — eliminación exitosa |
 | `400` | Bad Request — datos inválidos |
+| `401` | Unauthorized — token ausente o inválido |
+| `403` | Forbidden — rol insuficiente |
 | `404` | Not Found — recurso no encontrado |
 
 ---
@@ -668,8 +689,9 @@ PATCH /resources/:id/visibility
 | MariaDB | 10.11 |
 | Node.js | 18+ |
 | TypeScript | 5.7 |
+| JWT | @nestjs/jwt |
+| Bcrypt | bcrypt |
 
 ---
 
 *Ude@ Educación Virtual — Universidad de Antioquia*
-

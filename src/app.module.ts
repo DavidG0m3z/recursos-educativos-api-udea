@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { CategoriesModule } from './modules/categories/categories.modules';
 import { PositionModule } from './modules/position/position.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { UsersModule } from './modules/users/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from './modules/auth/guards/role.guard';
+
 
 @Module({
   imports: [
@@ -26,11 +32,22 @@ import { UsersModule } from './modules/users/user.module';
         synchronize: true,
       }),
     }),
+    AuthModule,
     ResourcesModule,
     CategoriesModule,
     PositionModule,
     RolesModule,
     UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}
