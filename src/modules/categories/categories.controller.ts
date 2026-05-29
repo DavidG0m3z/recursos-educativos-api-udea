@@ -5,7 +5,6 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Public } from '../auth/decorators/public.decorators';
 import { Roles } from '../auth/decorators/roles.decorators';
 import { RoleEnum } from '../../common/enums/role.enum';
 
@@ -23,13 +22,13 @@ export class CategoriesController {
         return this.categoriesServices.create(CreateCategoryDto);
     }
 
-    @Public()
+    @Roles(RoleEnum.ADMIN, RoleEnum.USER)
     @Get()
     findAll() {
         return this.categoriesServices.findAll();
     }
 
-    @Public()
+    @Roles(RoleEnum.ADMIN, RoleEnum.USER)
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.categoriesServices.findOne(id);

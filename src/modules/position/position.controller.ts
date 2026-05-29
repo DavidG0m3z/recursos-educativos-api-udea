@@ -5,7 +5,6 @@ import {
 import { PositionService } from './position.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
-import { Public } from '../auth/decorators/public.decorators';
 import { Roles } from '../auth/decorators/roles.decorators';
 import { RoleEnum } from '../../common/enums/role.enum';
 
@@ -20,13 +19,13 @@ export class PositionController {
     return this.positionService.create(createPositionDto);
   }
 
-  @Public()
+  @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Get()
   findAll() {
     return this.positionService.findAll();
   }
 
-  @Public()
+  @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.positionService.findOne(id);
