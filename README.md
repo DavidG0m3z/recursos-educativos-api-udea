@@ -180,6 +180,23 @@ La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles p
 | `403 Forbidden` | Token válido pero rol insuficiente |
 
 ---
+## Documentación interactiva (Swagger)
+
+La API cuenta con documentación interactiva generada automáticamente con **Swagger**.
+
+Una vez que la aplicación esté corriendo, accede a: `http://localhost:3000/api`.
+
+Desde ahí puedes ver y probar todos los endpoints directamente en el navegador.
+
+### Cómo autenticarte en Swagger
+
+1. Hacer login en `POST /auth/login` con tus credenciales
+2. Copiar el `access_token` de la respuesta
+3. Hacer clic en el botón **Authorize** en la esquina superior derecha
+4. Pegar el token en el campo **Value** y hacer clic en **Authorize**
+5. Todos los endpoints protegidos usarán ese token automáticamente
+
+---
 
 ## Endpoints
 
