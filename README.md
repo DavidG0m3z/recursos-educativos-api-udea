@@ -95,24 +95,28 @@ src/
 │   │   │   └── jwt.strategy.ts
 │   │   ├── auth.controller.ts
 │   │   ├── auth.module.ts
+│   │   ├── auth.service.spec.ts
 │   │   └── auth.service.ts
 │   ├── categories/
 │   │   ├── dto/
 │   │   ├── entities/
 │   │   ├── categories.controller.ts
 │   │   ├── categories.module.ts
+│   │   ├── categories.service.spec.ts
 │   │   └── categories.service.ts
 │   ├── position/
 │   │   ├── dto/
 │   │   ├── entities/
 │   │   ├── position.controller.ts
 │   │   ├── position.module.ts
+│   │   ├── position.service.spec.ts
 │   │   └── position.service.ts
 │   ├── resources/
 │   │   ├── dto/
 │   │   ├── entities/
 │   │   ├── resources.controller.ts
 │   │   ├── resources.module.ts
+│   │   ├── resources.service.spec.ts
 │   │   └── resources.service.ts
 │   ├── roles/
 │   │   ├── entities/
@@ -123,6 +127,7 @@ src/
 │       ├── entities/
 │       ├── users.controller.ts
 │       ├── users.module.ts
+│       ├── users.service.spec.ts
 │       └── users.service.ts
 └── app.module.ts
 ```
