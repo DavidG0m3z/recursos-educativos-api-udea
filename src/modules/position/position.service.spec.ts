@@ -104,7 +104,9 @@ describe('PositionService', () => {
       const result = await service.findOne(1);
 
       // Assert
-      expect(mockPositionRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockPositionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(result).toEqual(mockPosition);
     });
 
@@ -114,7 +116,9 @@ describe('PositionService', () => {
 
       // Act & Assert
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow('Cargo with id 999 not found');
+      await expect(service.findOne(999)).rejects.toThrow(
+        'Cargo with id 999 not found',
+      );
     });
   });
 
@@ -141,7 +145,9 @@ describe('PositionService', () => {
       mockPositionRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.update(999, {} as any)).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, {} as any)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

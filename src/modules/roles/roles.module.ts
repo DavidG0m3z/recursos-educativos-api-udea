@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
 import { RolesSeederService } from './roles--seeder.service';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([Role])],
   providers: [RolesSeederService],

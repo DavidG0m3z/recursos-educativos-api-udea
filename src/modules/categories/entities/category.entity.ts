@@ -3,7 +3,6 @@ import { Resource } from '../../resources/entities/resource.entity';
 
 @Entity('categories')
 export class Category {
-
   @PrimaryGeneratedColumn()
   id!: number;
 

@@ -10,7 +10,6 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 
 @Injectable()
 export class ResourcesService {
-
   constructor(
     @InjectRepository(Resource)
     private readonly resourceRepository: Repository<Resource>,
@@ -26,7 +25,8 @@ export class ResourcesService {
     const resource = this.resourceRepository.create(rest);
 
     if (categoryIds?.length) {
-      resource.categories = await this.categoryRepository.findByIds(categoryIds);
+      resource.categories =
+        await this.categoryRepository.findByIds(categoryIds);
     }
 
     if (positionIds?.length) {
@@ -48,12 +48,16 @@ export class ResourcesService {
     return resource;
   }
 
-  async update(id: number, updateResourceDto: UpdateResourceDto): Promise<Resource> {
+  async update(
+    id: number,
+    updateResourceDto: UpdateResourceDto,
+  ): Promise<Resource> {
     const resource = await this.findOne(id);
     const { categoryIds, positionIds, ...rest } = updateResourceDto;
 
     if (categoryIds?.length) {
-      resource.categories = await this.categoryRepository.findByIds(categoryIds);
+      resource.categories =
+        await this.categoryRepository.findByIds(categoryIds);
     }
 
     if (positionIds?.length) {

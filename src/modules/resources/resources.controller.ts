@@ -1,8 +1,22 @@
 import {
-  Controller, Get, Post, Patch, Delete,
-  Body, Param, ParseIntPipe, HttpCode, HttpStatus,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
@@ -11,7 +25,6 @@ import { RoleEnum } from '../../common/enums/role.enum';
 
 @Controller('resources')
 export class ResourcesController {
-
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Roles(RoleEnum.ADMIN)
@@ -28,7 +41,11 @@ export class ResourcesController {
   @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Obtener todos los recursos', description: 'Solo retorna recursos activos — excluye los eliminados con soft delete' })
+  @ApiOperation({
+    summary: 'Obtener todos los recursos',
+    description:
+      'Solo retorna recursos activos — excluye los eliminados con soft delete',
+  })
   @ApiResponse({ status: 200, description: 'Lista de recursos' })
   findAll() {
     return this.resourcesService.findAll();
@@ -64,7 +81,11 @@ export class ResourcesController {
   @Delete(':id')
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Eliminar un recurso (soft delete)', description: 'No borra el registro — solo marca deletedAt con la fecha actual' })
+  @ApiOperation({
+    summary: 'Eliminar un recurso (soft delete)',
+    description:
+      'No borra el registro — solo marca deletedAt con la fecha actual',
+  })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 204, description: 'Recurso eliminado' })
   @ApiResponse({ status: 404, description: 'Recurso no encontrado' })
@@ -77,7 +98,11 @@ export class ResourcesController {
   @Roles(RoleEnum.ADMIN)
   @Patch(':id/visibility')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Alternar visibilidad', description: 'Invierte el valor del campo hidden — true pasa a false y viceversa' })
+  @ApiOperation({
+    summary: 'Alternar visibilidad',
+    description:
+      'Invierte el valor del campo hidden — true pasa a false y viceversa',
+  })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Visibilidad actualizada' })
   @ApiResponse({ status: 404, description: 'Recurso no encontrado' })
@@ -89,7 +114,11 @@ export class ResourcesController {
   @Roles(RoleEnum.ADMIN)
   @Patch(':id/restore')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Restaurar recurso eliminado', description: 'Restaura un recurso eliminado con soft delete — pone deletedAt en null' })
+  @ApiOperation({
+    summary: 'Restaurar recurso eliminado',
+    description:
+      'Restaura un recurso eliminado con soft delete — pone deletedAt en null',
+  })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Recurso restaurado' })
   @ApiResponse({ status: 404, description: 'Recurso no encontrado' })

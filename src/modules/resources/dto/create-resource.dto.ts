@@ -10,8 +10,7 @@ import { Type } from 'class-transformer';
 import { ComplexityRefDto } from './complexity-ref.dto';
 
 export class CreateResourceDto {
-
- @IsString()
+  @IsString()
   @IsNotEmpty()
   title!: string;
 

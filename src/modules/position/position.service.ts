@@ -7,11 +7,10 @@ import { UpdatePositionDto } from './dto/update-position.dto';
 
 @Injectable()
 export class PositionService {
-
   constructor(
     @InjectRepository(Position)
-    private readonly positionRepository: Repository<Position>
-  ){}
+    private readonly positionRepository: Repository<Position>,
+  ) {}
 
   async create(createPositionDto: CreatePositionDto): Promise<Position> {
     const position = this.positionRepository.create(createPositionDto);
@@ -30,7 +29,10 @@ export class PositionService {
     return cargo;
   }
 
-  async update(id: number, updateCargoDto: UpdatePositionDto): Promise<Position> {
+  async update(
+    id: number,
+    updateCargoDto: UpdatePositionDto,
+  ): Promise<Position> {
     const position = await this.findOne(id);
     Object.assign(position, updateCargoDto);
     return await this.positionRepository.save(position);
@@ -40,6 +42,4 @@ export class PositionService {
     const position = await this.findOne(id);
     await this.positionRepository.remove(position);
   }
-
-
 }

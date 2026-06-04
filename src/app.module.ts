@@ -12,7 +12,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/role.guard';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({

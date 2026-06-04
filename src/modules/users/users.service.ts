@@ -9,7 +9,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -18,23 +17,23 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-  const { roleId, password, ...rest } = createUserDto;
+    const { roleId, password, ...rest } = createUserDto;
 
-  const role = await this.roleRepository.findOne({ where: { id: roleId } });
-  if (!role) {
-    throw new NotFoundException(`Role with id ${roleId} not found`);
+    const role = await this.roleRepository.findOne({ where: { id: roleId } });
+    if (!role) {
+      throw new NotFoundException(`Role with id ${roleId} not found`);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = this.userRepository.create({
+      ...rest,
+      password: hashedPassword,
+      role,
+    });
+
+    return await this.userRepository.save(user);
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = this.userRepository.create({
-    ...rest,
-    password: hashedPassword,
-    role,
-  });
-
-  return await this.userRepository.save(user);
-}
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find();

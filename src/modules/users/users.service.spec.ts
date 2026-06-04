@@ -6,7 +6,7 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 
-// --- MOCKS --- // 
+// --- MOCKS --- //
 
 const mockUserRepository = {
   create: jest.fn(),
@@ -19,7 +19,6 @@ const mockUserRepository = {
 const mockRoleRepository = {
   findOne: jest.fn(),
 };
-
 
 const mockRole: Role = {
   id: 1,
@@ -63,7 +62,7 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
-  // --- CREATE --- // 
+  // --- CREATE --- //
 
   describe('create', () => {
     it('debe crear un usuario con la contraseña hasheada', async () => {
@@ -82,7 +81,9 @@ describe('UsersService', () => {
       const result = await service.create(dto);
 
       // Assert
-      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(mockUserRepository.create).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
     });
@@ -120,7 +121,9 @@ describe('UsersService', () => {
 
       // Act & Assert
       await expect(service.create(dto)).rejects.toThrow(NotFoundException);
-      await expect(service.create(dto)).rejects.toThrow('Role with id 999 not found');
+      await expect(service.create(dto)).rejects.toThrow(
+        'Role with id 999 not found',
+      );
     });
   });
 
@@ -162,7 +165,9 @@ describe('UsersService', () => {
       const result = await service.findOne(1);
 
       // Assert
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(result).toEqual(mockUser);
     });
 
@@ -172,7 +177,9 @@ describe('UsersService', () => {
 
       // Act & Assert
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow('User with id 999 not found');
+      await expect(service.findOne(999)).rejects.toThrow(
+        'User with id 999 not found',
+      );
     });
   });
 
@@ -206,7 +213,9 @@ describe('UsersService', () => {
       const result = await service.update(1, dto);
 
       // Assert
-      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({ where: { id: 2 } });
+      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 2 },
+      });
       expect(result.role).toEqual(newRole);
     });
 
@@ -226,7 +235,9 @@ describe('UsersService', () => {
 
       // Act & Assert
       await expect(service.update(1, dto)).rejects.toThrow(NotFoundException);
-      await expect(service.update(1, dto)).rejects.toThrow('Role with id 999 not found');
+      await expect(service.update(1, dto)).rejects.toThrow(
+        'Role with id 999 not found',
+      );
     });
   });
 

@@ -3,7 +3,6 @@ import { Resource } from './resource.entity';
 
 @Entity('complexity_refs')
 export class ComplexityRef {
-
   @PrimaryGeneratedColumn()
   id!: number;
 

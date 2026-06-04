@@ -13,12 +13,11 @@ import { Position } from '../../position/entities/position.entity';
 
 @Entity('resources')
 export class Resource {
-    
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column({ type: 'varchar', length: 100 })
-    title!: string;
+  @Column({ type: 'varchar', length: 100 })
+  title!: string;
 
   @Column({ type: 'text' })
   description!: string;
@@ -47,4 +46,3 @@ export class Resource {
   @JoinTable({ name: 'resources_positions' })
   position!: Position[];
 }
-

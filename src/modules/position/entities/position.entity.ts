@@ -4,7 +4,6 @@ import { Participation } from '../../../common/enums/participation.enum';
 
 @Entity('positions')
 export class Position {
-
   @PrimaryGeneratedColumn()
   id!: number;
 

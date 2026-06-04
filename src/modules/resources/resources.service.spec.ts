@@ -10,21 +10,21 @@ import { Position } from '../position/entities/position.entity';
 // --- MOKS --- //
 
 const mockResourceRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    softDelete: jest.fn(),
-    restore: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+  find: jest.fn(),
+  findOne: jest.fn(),
+  softDelete: jest.fn(),
+  restore: jest.fn(),
 };
 
 const mockCategoryRepository = {
-    findByIds: jest.fn(),
-}
+  findByIds: jest.fn(),
+};
 
 const mockPositionRepository = {
-    findByIds: jest.fn(),
-}
+  findByIds: jest.fn(),
+};
 
 // --- DATOS DE PRUEBA --- //
 
@@ -98,7 +98,7 @@ describe('ResourcesService', () => {
       mockResourceRepository.save.mockResolvedValue(mockResource);
 
       // Act
-      const result = await service.create(dto as any);
+      const result = await service.create(dto);
 
       // Assert
       expect(mockResourceRepository.create).toHaveBeenCalledWith(dto);
@@ -125,7 +125,7 @@ describe('ResourcesService', () => {
       });
 
       // Act
-      const result = await service.create(dto as any);
+      const result = await service.create(dto);
 
       // Assert
       expect(mockCategoryRepository.findByIds).toHaveBeenCalledWith([1]);
@@ -173,7 +173,9 @@ describe('ResourcesService', () => {
       const result = await service.findOne(1);
 
       // Assert
-      expect(mockResourceRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockResourceRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(result).toEqual(mockResource);
     });
 
@@ -183,7 +185,9 @@ describe('ResourcesService', () => {
 
       // Act & Assert
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow('Resource with id 999 not found');
+      await expect(service.findOne(999)).rejects.toThrow(
+        'Resource with id 999 not found',
+      );
     });
   });
 
@@ -198,7 +202,7 @@ describe('ResourcesService', () => {
       mockResourceRepository.save.mockResolvedValue(updatedResource);
 
       // Act
-      const result = await service.update(1, dto as any);
+      const result = await service.update(1, dto);
 
       // Assert
       expect(result.title).toBe('Título actualizado');
@@ -209,7 +213,9 @@ describe('ResourcesService', () => {
       mockResourceRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.update(999, {} as any)).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, {} as any)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -301,7 +307,9 @@ describe('ResourcesService', () => {
       mockResourceRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.toggleVisibility(999)).rejects.toThrow(NotFoundException);
+      await expect(service.toggleVisibility(999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

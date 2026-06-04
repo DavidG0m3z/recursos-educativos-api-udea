@@ -7,21 +7,21 @@ import { Category } from './entities/category.entity';
 // --- MOCKS --- //
 
 const mockCategoryRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    remove: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+  find: jest.fn(),
+  findOne: jest.fn(),
+  remove: jest.fn(),
 };
 
 const mockCategory: Category = {
-    id: 1,
-    name: 'Video',
-    icon: 'video',
-    resources: [],
-}
+  id: 1,
+  name: 'Video',
+  icon: 'video',
+  resources: [],
+};
 
-// --- SUITE DE PRUEBAS --- // 
+// --- SUITE DE PRUEBAS --- //
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -101,7 +101,9 @@ describe('CategoriesService', () => {
       const result = await service.findOne(1);
 
       // Assert
-      expect(mockCategoryRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockCategoryRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(result).toEqual(mockCategory);
     });
 
@@ -111,7 +113,9 @@ describe('CategoriesService', () => {
 
       // Act & Assert
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow('Category with 999 not found');
+      await expect(service.findOne(999)).rejects.toThrow(
+        'Category with 999 not found',
+      );
     });
   });
 
@@ -137,7 +141,9 @@ describe('CategoriesService', () => {
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.update(999, {} as any)).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, {} as any)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
