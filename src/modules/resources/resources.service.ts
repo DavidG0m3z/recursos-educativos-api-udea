@@ -74,11 +74,16 @@ export class ResourcesService {
     const resource = await this.findOne(id);
     const { categoryIds, positions, ...rest } = updateResourceDto;
 
-    if (categoryIds?.length) {
-      resource.categories = await this.categoryRepository.findByIds(categoryIds);
+    if (categoryIds !== undefined) {
+      resource.categories = categoryIds.length
+        ? await this.categoryRepository.findByIds(categoryIds)
+        : [];
     }
 
-    if (positions?.length) {
+    Object.assign(resource, rest);
+    await this.resourceRepository.save(resource);
+
+    if (positions !== undefined) {
       await this.resourcePositionRepository.delete({ resource: { id } });
 
       for (const pos of positions) {
@@ -97,8 +102,7 @@ export class ResourcesService {
       }
     }
 
-    Object.assign(resource, rest);
-    return await this.resourceRepository.save(resource);
+    return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
