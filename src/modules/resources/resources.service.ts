@@ -79,10 +79,8 @@ export class ResourcesService {
     }
 
     if (positions?.length) {
-      // Eliminamos los positions anteriores del recurso
       await this.resourcePositionRepository.delete({ resource: { id } });
 
-      // Creamos los nuevos
       for (const pos of positions) {
         const position = await this.positionRepository.findOne({
           where: { id: pos.positionId },
