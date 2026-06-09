@@ -6,7 +6,7 @@ export class CreatePositionDto {
   @IsNotEmpty()
   name!: string;
 
-  @IsEnum(Participation)
-  @IsNotEmpty()
-  participation!: Participation;
+  //@IsEnum(Participation)
+  //@IsNotEmpty()
+  //participation!: Participation;
 }

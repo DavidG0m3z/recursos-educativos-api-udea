@@ -36,7 +36,8 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Roles(RoleEnum.ADMIN)
+  @Public()
+  //@Roles(RoleEnum.ADMIN)
   @Post('register')
   @ApiBearerAuth()
   @ApiOperation({

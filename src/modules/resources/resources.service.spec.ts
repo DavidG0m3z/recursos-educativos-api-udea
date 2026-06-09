@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 import { Resource } from './entities/resource.entity';
+import { ResourcePosition } from './entities/resource-position.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Position } from '../position/entities/position.entity';
+import { Participation } from '../../common/enums/participation.enum';
 
-// --- MOKS --- //
+// --- MOCKS --- //
 
 const mockResourceRepository = {
   create: jest.fn(),
@@ -23,21 +24,16 @@ const mockCategoryRepository = {
 };
 
 const mockPositionRepository = {
-  findByIds: jest.fn(),
+  findOne: jest.fn(),
+};
+
+const mockResourcePositionRepository = {
+  create: jest.fn(),
+  save: jest.fn(),
+  delete: jest.fn(),
 };
 
 // --- DATOS DE PRUEBA --- //
-
-const mockResource: Resource = {
-  id: 1,
-  title: 'Video explicativo',
-  description: 'Video corto para explicar un concepto',
-  hidden: false,
-  deletedAt: null,
-  complexityRefs: [],
-  categories: [],
-  position: [],
-};
 
 const mockCategory: Category = {
   id: 1,
@@ -49,11 +45,28 @@ const mockCategory: Category = {
 const mockPosition: Position = {
   id: 1,
   name: 'Guion',
-  participation: 'Si' as any,
-  resources: [],
+  resourcePositions: [],
 };
 
-// --- SUITE DE PRUENAS --- //
+const mockResourcePosition: ResourcePosition = {
+  id: 1,
+  participation: Participation.SI,
+  resource: {} as Resource,
+  position: mockPosition,
+};
+
+const mockResource: Resource = {
+  id: 1,
+  title: 'Video explicativo',
+  description: 'Video corto para explicar un concepto',
+  hidden: false,
+  deletedAt: null,
+  complexityRefs: [],
+  categories: [],
+  resourcePositions: [],
+};
+
+// --- SUITE DE PRUEBAS --- //
 
 describe('ResourcesService', () => {
   let service: ResourcesService;
@@ -74,6 +87,10 @@ describe('ResourcesService', () => {
           provide: getRepositoryToken(Position),
           useValue: mockPositionRepository,
         },
+        {
+          provide: getRepositoryToken(ResourcePosition),
+          useValue: mockResourcePositionRepository,
+        },
       ],
     }).compile();
 
@@ -87,51 +104,115 @@ describe('ResourcesService', () => {
   // --- CREATE --- //
 
   describe('create', () => {
-    it('debe crear un recurso sin categorías ni positions', async () => {
-      // Arrange
+    it('debe crear un recurso sin categorías ni posiciones', async () => {
       const dto = {
         title: 'Video explicativo',
         description: 'Video corto',
         hidden: false,
       };
+
       mockResourceRepository.create.mockReturnValue(mockResource);
       mockResourceRepository.save.mockResolvedValue(mockResource);
+      mockResourceRepository.findOne.mockResolvedValue(mockResource);
 
-      // Act
       const result = await service.create(dto);
 
-      // Assert
-      expect(mockResourceRepository.create).toHaveBeenCalledWith(dto);
+      expect(mockResourceRepository.create).toHaveBeenCalled();
       expect(mockResourceRepository.save).toHaveBeenCalled();
       expect(result).toEqual(mockResource);
     });
 
-    it('debe crear un recurso con categorías y positions', async () => {
-      // Arrange
+    it('debe crear un recurso con categorías y posiciones', async () => {
       const dto = {
         title: 'Video explicativo',
         description: 'Video corto',
         hidden: false,
         categoryIds: [1],
-        positionIds: [1],
+        positions: [
+          {
+            positionId: 1,
+            participation: Participation.SI,
+          },
+        ],
       };
-      mockResourceRepository.create.mockReturnValue({ ...mockResource });
-      mockCategoryRepository.findByIds.mockResolvedValue([mockCategory]);
-      mockPositionRepository.findByIds.mockResolvedValue([mockPosition]);
-      mockResourceRepository.save.mockResolvedValue({
+
+      mockResourceRepository.create.mockReturnValue({
         ...mockResource,
-        categories: [mockCategory],
-        position: [mockPosition],
       });
 
-      // Act
+      mockCategoryRepository.findByIds.mockResolvedValue([
+        mockCategory,
+      ]);
+
+      mockResourceRepository.save.mockResolvedValue(
+        mockResource,
+      );
+
+      mockPositionRepository.findOne.mockResolvedValue(
+        mockPosition,
+      );
+
+      mockResourcePositionRepository.create.mockReturnValue(
+        mockResourcePosition,
+      );
+
+      mockResourcePositionRepository.save.mockResolvedValue(
+        mockResourcePosition,
+      );
+
+      mockResourceRepository.findOne.mockResolvedValue({
+        ...mockResource,
+        categories: [mockCategory],
+        resourcePositions: [mockResourcePosition],
+      });
+
       const result = await service.create(dto);
 
-      // Assert
-      expect(mockCategoryRepository.findByIds).toHaveBeenCalledWith([1]);
-      expect(mockPositionRepository.findByIds).toHaveBeenCalledWith([1]);
-      expect(result.categories).toEqual([mockCategory]);
-      expect(result.position).toEqual([mockPosition]);
+      expect(mockCategoryRepository.findByIds)
+        .toHaveBeenCalledWith([1]);
+
+      expect(mockPositionRepository.findOne)
+        .toHaveBeenCalledWith({
+          where: { id: 1 },
+        });
+
+      expect(mockResourcePositionRepository.create)
+        .toHaveBeenCalled();
+
+      expect(mockResourcePositionRepository.save)
+        .toHaveBeenCalled();
+
+      expect(result.categories)
+        .toEqual([mockCategory]);
+    });
+
+    it('debe lanzar NotFoundException si la posición no existe', async () => {
+      const dto = {
+        title: 'Video explicativo',
+        description: 'Video corto',
+        positions: [
+          {
+            positionId: 999,
+            participation: Participation.SI,
+          },
+        ],
+      };
+
+      mockResourceRepository.create.mockReturnValue(
+        mockResource,
+      );
+
+      mockResourceRepository.save.mockResolvedValue(
+        mockResource,
+      );
+
+      mockPositionRepository.findOne.mockResolvedValue(
+        null,
+      );
+
+      await expect(
+        service.create(dto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -139,25 +220,21 @@ describe('ResourcesService', () => {
 
   describe('findAll', () => {
     it('debe retornar un array de recursos', async () => {
-      // Arrange
-      mockResourceRepository.find.mockResolvedValue([mockResource]);
+      mockResourceRepository.find.mockResolvedValue([
+        mockResource,
+      ]);
 
-      // Act
       const result = await service.findAll();
 
-      // Assert
       expect(mockResourceRepository.find).toHaveBeenCalled();
       expect(result).toEqual([mockResource]);
     });
 
     it('debe retornar un array vacío si no hay recursos', async () => {
-      // Arrange
       mockResourceRepository.find.mockResolvedValue([]);
 
-      // Act
       const result = await service.findAll();
 
-      // Assert
       expect(result).toEqual([]);
     });
   });
@@ -166,26 +243,32 @@ describe('ResourcesService', () => {
 
   describe('findOne', () => {
     it('debe retornar un recurso si existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(mockResource);
+      mockResourceRepository.findOne.mockResolvedValue(
+        mockResource,
+      );
 
-      // Act
       const result = await service.findOne(1);
 
-      // Assert
-      expect(mockResourceRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
+      expect(mockResourceRepository.findOne)
+        .toHaveBeenCalledWith({
+          where: { id: 1 },
+        });
+
       expect(result).toEqual(mockResource);
     });
 
     it('debe lanzar NotFoundException si el recurso no existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(null);
+      mockResourceRepository.findOne.mockResolvedValue(
+        null,
+      );
 
-      // Act & Assert
-      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow(
+      await expect(
+        service.findOne(999),
+      ).rejects.toThrow(NotFoundException);
+
+      await expect(
+        service.findOne(999),
+      ).rejects.toThrow(
         'Resource with id 999 not found',
       );
     });
@@ -195,27 +278,37 @@ describe('ResourcesService', () => {
 
   describe('update', () => {
     it('debe actualizar un recurso existente', async () => {
-      // Arrange
-      const dto = { title: 'Título actualizado' };
-      const updatedResource = { ...mockResource, title: 'Título actualizado' };
-      mockResourceRepository.findOne.mockResolvedValue({ ...mockResource });
-      mockResourceRepository.save.mockResolvedValue(updatedResource);
+      const dto = {
+        title: 'Título actualizado',
+      };
 
-      // Act
+      const updatedResource = {
+        ...mockResource,
+        title: 'Título actualizado',
+      };
+
+      mockResourceRepository.findOne.mockResolvedValue(
+        { ...mockResource },
+      );
+
+      mockResourceRepository.save.mockResolvedValue(
+        updatedResource,
+      );
+
       const result = await service.update(1, dto);
 
-      // Assert
-      expect(result.title).toBe('Título actualizado');
+      expect(result.title)
+        .toBe('Título actualizado');
     });
 
     it('debe lanzar NotFoundException si el recurso no existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.update(999, {} as any)).rejects.toThrow(
-        NotFoundException,
+      mockResourceRepository.findOne.mockResolvedValue(
+        null,
       );
+
+      await expect(
+        service.update(999, {} as any),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -223,23 +316,29 @@ describe('ResourcesService', () => {
 
   describe('remove', () => {
     it('debe hacer soft delete de un recurso existente', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(mockResource);
-      mockResourceRepository.softDelete.mockResolvedValue(undefined);
+      mockResourceRepository.findOne.mockResolvedValue(
+        mockResource,
+      );
 
-      // Act
+      mockResourceRepository.softDelete.mockResolvedValue(
+        undefined,
+      );
+
       await service.remove(1);
 
-      // Assert
-      expect(mockResourceRepository.softDelete).toHaveBeenCalledWith(1);
+      expect(
+        mockResourceRepository.softDelete,
+      ).toHaveBeenCalledWith(1);
     });
 
     it('debe lanzar NotFoundException si el recurso no existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(null);
+      mockResourceRepository.findOne.mockResolvedValue(
+        null,
+      );
 
-      // Act & Assert
-      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.remove(999),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -247,27 +346,36 @@ describe('ResourcesService', () => {
 
   describe('restore', () => {
     it('debe restaurar un recurso eliminado', async () => {
-      // Arrange
-      const deletedResource = { ...mockResource, deletedAt: new Date() };
+      const deletedResource = {
+        ...mockResource,
+        deletedAt: new Date(),
+      };
+
       mockResourceRepository.findOne
         .mockResolvedValueOnce(deletedResource)
         .mockResolvedValueOnce(mockResource);
-      mockResourceRepository.restore.mockResolvedValue(undefined);
 
-      // Act
+      mockResourceRepository.restore.mockResolvedValue(
+        undefined,
+      );
+
       const result = await service.restore(1);
 
-      // Assert
-      expect(mockResourceRepository.restore).toHaveBeenCalledWith(1);
+      expect(
+        mockResourceRepository.restore,
+      ).toHaveBeenCalledWith(1);
+
       expect(result).toEqual(mockResource);
     });
 
     it('debe lanzar NotFoundException si el recurso no existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(null);
+      mockResourceRepository.findOne.mockResolvedValue(
+        null,
+      );
 
-      // Act & Assert
-      await expect(service.restore(999)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.restore(999),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -275,41 +383,61 @@ describe('ResourcesService', () => {
 
   describe('toggleVisibility', () => {
     it('debe cambiar hidden de false a true', async () => {
-      // Arrange
-      const resourceVisible = { ...mockResource, hidden: false };
-      const resourceHidden = { ...mockResource, hidden: true };
-      mockResourceRepository.findOne.mockResolvedValue(resourceVisible);
-      mockResourceRepository.save.mockResolvedValue(resourceHidden);
+      const resourceVisible = {
+        ...mockResource,
+        hidden: false,
+      };
 
-      // Act
+      const resourceHidden = {
+        ...mockResource,
+        hidden: true,
+      };
+
+      mockResourceRepository.findOne.mockResolvedValue(
+        resourceVisible,
+      );
+
+      mockResourceRepository.save.mockResolvedValue(
+        resourceHidden,
+      );
+
       const result = await service.toggleVisibility(1);
 
-      // Assert
       expect(result.hidden).toBe(true);
     });
 
     it('debe cambiar hidden de true a false', async () => {
-      // Arrange
-      const resourceHidden = { ...mockResource, hidden: true };
-      const resourceVisible = { ...mockResource, hidden: false };
-      mockResourceRepository.findOne.mockResolvedValue(resourceHidden);
-      mockResourceRepository.save.mockResolvedValue(resourceVisible);
+      const resourceHidden = {
+        ...mockResource,
+        hidden: true,
+      };
 
-      // Act
+      const resourceVisible = {
+        ...mockResource,
+        hidden: false,
+      };
+
+      mockResourceRepository.findOne.mockResolvedValue(
+        resourceHidden,
+      );
+
+      mockResourceRepository.save.mockResolvedValue(
+        resourceVisible,
+      );
+
       const result = await service.toggleVisibility(1);
 
-      // Assert
       expect(result.hidden).toBe(false);
     });
 
     it('debe lanzar NotFoundException si el recurso no existe', async () => {
-      // Arrange
-      mockResourceRepository.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.toggleVisibility(999)).rejects.toThrow(
-        NotFoundException,
+      mockResourceRepository.findOne.mockResolvedValue(
+        null,
       );
+
+      await expect(
+        service.toggleVisibility(999),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

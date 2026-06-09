@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Resource } from './entities/resource.entity';
-import { ComplexityRef } from './entities/complexity-ref.entity';
+import { ResourcePosition } from './entities/resource-position.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Position } from '../position/entities/position.entity';
 import { CreateResourceDto } from './dto/create-resource.dto';
@@ -10,30 +10,52 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 
 @Injectable()
 export class ResourcesService {
+
   constructor(
     @InjectRepository(Resource)
     private readonly resourceRepository: Repository<Resource>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Position)
-    private readonly cargoRepository: Repository<Position>,
+    private readonly positionRepository: Repository<Position>,
+    @InjectRepository(ResourcePosition)
+    private readonly resourcePositionRepository: Repository<ResourcePosition>,
   ) {}
 
   async create(createResourceDto: CreateResourceDto): Promise<Resource> {
-    const { categoryIds, positionIds, ...rest } = createResourceDto;
+    const { categoryIds, positions, complexityRefs, ...rest } = createResourceDto;
 
-    const resource = this.resourceRepository.create(rest);
+    const resource = this.resourceRepository.create({
+      ...rest,
+      // Pasamos complexityRefs separado para que TypeORM lo maneje correctamente
+      complexityRefs: complexityRefs as any,
+    });
 
     if (categoryIds?.length) {
-      resource.categories =
-        await this.categoryRepository.findByIds(categoryIds);
+      resource.categories = await this.categoryRepository.findByIds(categoryIds);
     }
 
-    if (positionIds?.length) {
-      resource.position = await this.cargoRepository.findByIds(positionIds);
+    // Guardamos el recurso y obtenemos el id
+    const savedResource = await this.resourceRepository.save(resource) as Resource;
+
+    if (positions?.length) {
+      for (const pos of positions) {
+        const position = await this.positionRepository.findOne({
+          where: { id: pos.positionId },
+        });
+        if (!position) {
+          throw new NotFoundException(`Position with id ${pos.positionId} not found`);
+        }
+        const resourcePosition = this.resourcePositionRepository.create({
+          resource: { id: savedResource.id },
+          position,
+          participation: pos.participation,
+        });
+        await this.resourcePositionRepository.save(resourcePosition);
+      }
     }
 
-    return await this.resourceRepository.save(resource);
+    return await this.findOne(savedResource.id);
   }
 
   async findAll(): Promise<Resource[]> {
@@ -48,20 +70,33 @@ export class ResourcesService {
     return resource;
   }
 
-  async update(
-    id: number,
-    updateResourceDto: UpdateResourceDto,
-  ): Promise<Resource> {
+  async update(id: number, updateResourceDto: UpdateResourceDto): Promise<Resource> {
     const resource = await this.findOne(id);
-    const { categoryIds, positionIds, ...rest } = updateResourceDto;
+    const { categoryIds, positions, ...rest } = updateResourceDto;
 
     if (categoryIds?.length) {
-      resource.categories =
-        await this.categoryRepository.findByIds(categoryIds);
+      resource.categories = await this.categoryRepository.findByIds(categoryIds);
     }
 
-    if (positionIds?.length) {
-      resource.position = await this.cargoRepository.findByIds(positionIds);
+    if (positions?.length) {
+      // Eliminamos los positions anteriores del recurso
+      await this.resourcePositionRepository.delete({ resource: { id } });
+
+      // Creamos los nuevos
+      for (const pos of positions) {
+        const position = await this.positionRepository.findOne({
+          where: { id: pos.positionId },
+        });
+        if (!position) {
+          throw new NotFoundException(`Position with id ${pos.positionId} not found`);
+        }
+        const resourcePosition = this.resourcePositionRepository.create({
+          resource,
+          position,
+          participation: pos.participation,
+        });
+        await this.resourcePositionRepository.save(resourcePosition);
+      }
     }
 
     Object.assign(resource, rest);
