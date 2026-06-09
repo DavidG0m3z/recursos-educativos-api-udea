@@ -10,9 +10,11 @@ import {
 import { ComplexityRef } from './complexity-ref.entity';
 import { Category } from '../../categories/entities/category.entity';
 import { Position } from '../../position/entities/position.entity';
+import { ResourcePosition } from './resource-position.entity';
 
 @Entity('resources')
 export class Resource {
+
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -40,9 +42,9 @@ export class Resource {
   @JoinTable({ name: 'resources_categories' })
   categories!: Category[];
 
-  @ManyToMany(() => Position, (position) => position.resources, {
+  @OneToMany(() => ResourcePosition, (rp) => rp.resource, {
+    cascade: true,
     eager: true,
   })
-  @JoinTable({ name: 'resources_positions' })
-  position!: Position[];
+  resourcePositions!: ResourcePosition[];
 }

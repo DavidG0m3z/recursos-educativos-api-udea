@@ -8,8 +8,10 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ComplexityRefDto } from './complexity-ref.dto';
+import { ResourcePositionDto } from './resource-position.dto';
 
 export class CreateResourceDto {
+
   @IsString()
   @IsNotEmpty()
   title!: string;
@@ -22,15 +24,15 @@ export class CreateResourceDto {
   @IsBoolean()
   hidden?: boolean;
 
-  // IDs de las categorías a asociar
   @IsOptional()
   @IsArray()
   categoryIds?: number[];
 
-  // IDs de los cargos a asociar
   @IsOptional()
   @IsArray()
-  positionIds?: number[];
+  @ValidateNested({ each: true })
+  @Type(() => ResourcePositionDto)
+  positions?: ResourcePositionDto[];
 
   @IsOptional()
   @IsArray()

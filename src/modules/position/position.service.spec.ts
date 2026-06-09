@@ -3,9 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { PositionService } from './position.service';
 import { Position } from './entities/position.entity';
-import { Participation } from '../../common/enums/participation.enum';
 
-// ─── MOCKS ───────────────────────────────────────────────────────────────────
+// --- MOCKS --- // 
 
 const mockPositionRepository = {
   create: jest.fn(),
@@ -15,16 +14,13 @@ const mockPositionRepository = {
   remove: jest.fn(),
 };
 
-// ─── DATOS DE PRUEBA ─────────────────────────────────────────────────────────
-
 const mockPosition: Position = {
   id: 1,
   name: 'Guion',
-  participation: Participation.SI,
-  resources: [],
+  resourcePositions: [],
 };
 
-// ─── SUITE DE PRUEBAS ────────────────────────────────────────────────────────
+// --- SUITE DE PRUEBAS --- //
 
 describe('PositionService', () => {
   let service: PositionService;
@@ -47,12 +43,12 @@ describe('PositionService', () => {
     jest.clearAllMocks();
   });
 
-  // ─── CREATE ───────────────────────────────────────────────────────────────
+  // --- CREATE --- //
 
   describe('create', () => {
     it('debe crear un position correctamente', async () => {
       // Arrange
-      const dto = { name: 'Guion', participation: Participation.SI };
+      const dto = { name: 'Guion' };
       mockPositionRepository.create.mockReturnValue(mockPosition);
       mockPositionRepository.save.mockResolvedValue(mockPosition);
 
@@ -66,7 +62,7 @@ describe('PositionService', () => {
     });
   });
 
-  // ─── FIND ALL ─────────────────────────────────────────────────────────────
+  // --- FIND ALL --- // 
 
   describe('findAll', () => {
     it('debe retornar un array de positions', async () => {
@@ -93,7 +89,7 @@ describe('PositionService', () => {
     });
   });
 
-  // ─── FIND ONE ─────────────────────────────────────────────────────────────
+  // --- FIND ONE --- //
 
   describe('findOne', () => {
     it('debe retornar un position si existe', async () => {
@@ -104,9 +100,7 @@ describe('PositionService', () => {
       const result = await service.findOne(1);
 
       // Assert
-      expect(mockPositionRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
+      expect(mockPositionRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
       expect(result).toEqual(mockPosition);
     });
 
@@ -116,18 +110,16 @@ describe('PositionService', () => {
 
       // Act & Assert
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow(
-        'Cargo with id 999 not found',
-      );
+      await expect(service.findOne(999)).rejects.toThrow('Cargo with id 999 not found');
     });
   });
 
-  // ─── UPDATE ───────────────────────────────────────────────────────────────
+  // --- UPDATE --- //
 
   describe('update', () => {
     it('debe actualizar un position existente', async () => {
       // Arrange
-      const dto = { name: 'Diseño', participation: Participation.DEPENDE };
+      const dto = { name: 'Diseño' };
       const updatedPosition = { ...mockPosition, ...dto };
       mockPositionRepository.findOne.mockResolvedValue({ ...mockPosition });
       mockPositionRepository.save.mockResolvedValue(updatedPosition);
@@ -137,7 +129,6 @@ describe('PositionService', () => {
 
       // Assert
       expect(result.name).toBe('Diseño');
-      expect(result.participation).toBe(Participation.DEPENDE);
     });
 
     it('debe lanzar NotFoundException si el position no existe', async () => {
@@ -145,13 +136,11 @@ describe('PositionService', () => {
       mockPositionRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.update(999, {} as any)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.update(999, {} as any)).rejects.toThrow(NotFoundException);
     });
   });
 
-  // ─── REMOVE ───────────────────────────────────────────────────────────────
+  // --- REMOVE --- //
 
   describe('remove', () => {
     it('debe eliminar un position existente', async () => {
