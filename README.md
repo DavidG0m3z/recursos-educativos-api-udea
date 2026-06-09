@@ -99,32 +99,49 @@ src/
 │   │   └── auth.service.ts
 │   ├── categories/
 │   │   ├── dto/
+│   │   │   ├── create-category.dto.ts
+│   │   │   └── update-category.dto.ts
 │   │   ├── entities/
+│   │   │   └── category.entity.ts
 │   │   ├── categories.controller.ts
 │   │   ├── categories.module.ts
 │   │   ├── categories.service.spec.ts
 │   │   └── categories.service.ts
 │   ├── position/
 │   │   ├── dto/
+│   │   │   ├── create-position.dto.ts
+│   │   │   └── update-position.dto.ts
 │   │   ├── entities/
+│   │   │   └── position.entity.ts
 │   │   ├── position.controller.ts
 │   │   ├── position.module.ts
 │   │   ├── position.service.spec.ts
 │   │   └── position.service.ts
 │   ├── resources/
 │   │   ├── dto/
+│   │   │   ├── complexity-ref.dto.ts
+│   │   │   ├── create-resource.dto.ts
+│   │   │   ├── resource-position.dto.ts
+│   │   │   └── update-resource.dto.ts
 │   │   ├── entities/
+│   │   │   ├── complexity-ref.entity.ts
+│   │   │   ├── resource-position.entity.ts
+│   │   │   └── resource.entity.ts
 │   │   ├── resources.controller.ts
 │   │   ├── resources.module.ts
 │   │   ├── resources.service.spec.ts
 │   │   └── resources.service.ts
 │   ├── roles/
 │   │   ├── entities/
+│   │   │   └── role.entity.ts
 │   │   ├── roles.module.ts
 │   │   └── roles-seeder.service.ts
 │   └── users/
 │       ├── dto/
+│       │   ├── create-user.dto.ts
+│       │   └── update-user.dto.ts
 │       ├── entities/
+│       │   └── user.entity.ts
 │       ├── users.controller.ts
 │       ├── users.module.ts
 │       ├── users.service.spec.ts
@@ -145,7 +162,7 @@ El proyecto usa **MariaDB 10.11** via Docker. Las tablas se crean automáticamen
 | `categories` | Categorías de recursos |
 | `resources_categories` | Relación N:M entre recursos y categorías |
 | `positions` | Cargos del equipo de producción |
-| `resources_positions` | Relación N:M entre recursos y cargos |
+| `resources_positions` | Relación N:M entre recursos y positions — incluye campo `participation` |
 | `roles` | Roles de usuario (admin, user) |
 | `users` | Usuarios de la plataforma |
 
@@ -155,26 +172,28 @@ El proyecto usa **MariaDB 10.11** via Docker. Las tablas se crean automáticamen
 
 La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles para autorización.
 
+> **Todos los endpoints requieren token**, excepto `POST /auth/login` y `POST /auth/register`.
+
 ### Roles
 
-| Rol | Descripción |
+| Rol | Permisos |
 |---|---|
-| `admin` | Lectura y escritura — acceso total |
-| `user` | Solo lectura — acceso a endpoints GET |
+| `admin` | Lectura y escritura — acceso total a todos los endpoints |
+| `user` | Solo lectura — acceso únicamente a endpoints GET |
 
 ### Permisos por método HTTP
 
-| Método | Acceso requerido |
+| Método | Rol requerido |
 |---|---|
-| `GET` | Token con rol `admin` o `user` |
-| `POST` | Token con rol `admin` |
-| `PATCH` | Token con rol `admin` |
-| `DELETE` | Token con rol `admin` |
+| `GET` | `admin` o `user` |
+| `POST` | Solo `admin` |
+| `PATCH` | Solo `admin` |
+| `DELETE` | Solo `admin` |
 
 ### Cómo usar el token en Postman
 
 1. Hacer login en `POST /auth/login` y copiar el `access_token`
-2. En cada request protegido ir a **Authorization → Bearer Token**
+2. En cada request ir a **Authorization → Bearer Token**
 3. Pegar el token en el campo **Token**
 
 ### Códigos de error de autenticación
@@ -185,6 +204,7 @@ La API usa **JWT (JSON Web Tokens)** para autenticación y un sistema de roles p
 | `403 Forbidden` | Token válido pero rol insuficiente |
 
 ---
+
 ## Documentación interactiva (Swagger)
 
 La API cuenta con documentación interactiva generada automáticamente con **Swagger**.
@@ -207,24 +227,28 @@ Desde ahí puedes ver y probar todos los endpoints directamente en el navegador.
 
 La URL base es `http://localhost:3000`.
 
-Los endpoints marcados con 🔒 requieren token con rol `admin` o `user` en el header:
+Los endpoints marcados con 🔒 requieren token con rol `admin`.
+Los endpoints marcados con 👁 requieren token con rol `admin` o `user`.
+Los endpoints marcados con 🌐 son públicos y no requieren token.
+
 ```
 Authorization: Bearer <token>
 ```
-
-Los endpoints marcados con 🌐 son públicos y no requieren token.
 
 ---
 
 ### Auth
 
-#### Registro de usuario 🔒
+#### Registro de usuario 🌐
+
 ```
 POST /auth/register
 ```
-> Endpoint para crear el primer usuario administrador. No requiere token.
+
+> Endpoint público para crear el primer usuario administrador.
 
 **Body:**
+
 ```json
 {
     "name": "Admin Ude@",
@@ -233,9 +257,11 @@ POST /auth/register
     "roleId": 1
 }
 ```
+
 > `roleId`: `1` = admin, `2` = user
 
 **Respuesta `201`:**
+
 ```json
 {
     "id": 1,
@@ -253,17 +279,22 @@ POST /auth/register
 ---
 
 #### Login 🌐
+
 ```
 POST /auth/login
 ```
+
 **Body:**
+
 ```json
 {
     "email": "admin@udea.edu.co",
     "password": "12345678"
 }
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -281,17 +312,22 @@ POST /auth/login
 ### Categories
 
 #### Crear categoría 🔒
+
 ```
 POST /categories
 ```
+
 **Body:**
+
 ```json
 {
     "name": "Video",
     "icon": "video"
 }
 ```
+
 **Respuesta `201`:**
+
 ```json
 {
     "id": 1,
@@ -302,11 +338,14 @@ POST /categories
 
 ---
 
-#### Obtener todas las categorías 🔒
+#### Obtener todas las categorías 👁
+
 ```
 GET /categories
 ```
+
 **Respuesta `200`:**
+
 ```json
 [
     {
@@ -319,11 +358,14 @@ GET /categories
 
 ---
 
-#### Obtener una categoría por id 🔒
+#### Obtener una categoría por id 👁
+
 ```
 GET /categories/:id
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
@@ -335,17 +377,22 @@ GET /categories/:id
 ---
 
 #### Actualizar una categoría 🔒
+
 ```
 PATCH /categories/:id
 ```
+
 **Body (todos los campos son opcionales):**
+
 ```json
 {
     "name": "Video actualizado",
     "icon": "video-camera"
 }
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
@@ -357,97 +404,111 @@ PATCH /categories/:id
 ---
 
 #### Eliminar una categoría 🔒
+
 ```
 DELETE /categories/:id
 ```
+
 **Respuesta `204 No Content`**
 
 ---
 
 ### Positions
 
-Los valores válidos para `participation` son: `Si`, `No`, `Depende`.
+> Los positions solo tienen `name`. El campo `participation` ahora vive en la relación con el recurso — se define al crear o actualizar un recurso.
 
 #### Crear position 🔒
+
 ```
 POST /position
 ```
+
 **Body:**
+
 ```json
 {
-    "name": "Guion",
-    "participation": "Si"
+    "name": "Guion"
 }
 ```
+
 **Respuesta `201`:**
+
 ```json
 {
     "id": 1,
-    "name": "Guion",
-    "participation": "Si"
+    "name": "Guion"
 }
 ```
 
 ---
 
-#### Obtener todos los positions 🔒
+#### Obtener todos los positions 👁
+
 ```
 GET /position
 ```
+
 **Respuesta `200`:**
+
 ```json
 [
     {
         "id": 1,
-        "name": "Guion",
-        "participation": "Si"
+        "name": "Guion"
     }
 ]
 ```
 
 ---
 
-#### Obtener un position por id 🔒
+#### Obtener un position por id 👁
+
 ```
 GET /position/:id
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
-    "name": "Guion",
-    "participation": "Si"
+    "name": "Guion"
 }
 ```
 
 ---
 
 #### Actualizar un position 🔒
+
 ```
 PATCH /position/:id
 ```
+
 **Body (todos los campos son opcionales):**
+
 ```json
 {
-    "name": "Diseño",
-    "participation": "Depende"
+    "name": "Diseño"
 }
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
-    "name": "Diseño",
-    "participation": "Depende"
+    "name": "Diseño"
 }
 ```
 
 ---
 
 #### Eliminar un position 🔒
+
 ```
 DELETE /position/:id
 ```
+
 **Respuesta `204 No Content`**
 
 ---
@@ -455,10 +516,13 @@ DELETE /position/:id
 ### Users
 
 #### Crear usuario 🔒
+
 ```
 POST /users
 ```
+
 **Body:**
+
 ```json
 {
     "name": "Jhon Doe",
@@ -467,9 +531,11 @@ POST /users
     "roleId": 1
 }
 ```
+
 > `roleId`: `1` = admin, `2` = user
 
 **Respuesta `201`:**
+
 ```json
 {
     "id": 1,
@@ -487,10 +553,13 @@ POST /users
 ---
 
 #### Obtener todos los usuarios 🔒
+
 ```
 GET /users
 ```
+
 **Respuesta `200`:**
+
 ```json
 [
     {
@@ -509,10 +578,13 @@ GET /users
 ---
 
 #### Obtener un usuario por id 🔒
+
 ```
 GET /users/:id
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
@@ -529,17 +601,22 @@ GET /users/:id
 ---
 
 #### Actualizar un usuario 🔒
+
 ```
 PATCH /users/:id
 ```
+
 **Body (todos los campos son opcionales):**
+
 ```json
 {
     "name": "Jhon Doe Actualizado",
     "roleId": 2
 }
 ```
+
 **Respuesta `200`:**
+
 ```json
 {
     "id": 1,
@@ -556,9 +633,11 @@ PATCH /users/:id
 ---
 
 #### Eliminar un usuario 🔒
+
 ```
 DELETE /users/:id
 ```
+
 **Respuesta `204 No Content`**
 
 ---
@@ -566,17 +645,27 @@ DELETE /users/:id
 ### Resources
 
 #### Crear recurso 🔒
+
 ```
 POST /resources
 ```
+
+> Cada position se envía con su propio valor de `participation`. Los valores válidos son `Si`, `No`, `Depende`.
+
 **Body:**
+
 ```json
 {
     "title": "Video explicativo",
     "description": "Video corto para explicar un concepto",
     "hidden": false,
     "categoryIds": [1],
-    "positionIds": [1],
+    "positions": [
+        {
+            "positionId": 1,
+            "participation": "Si"
+        }
+    ],
     "complexityRefs": [
         {
             "level": 1,
@@ -586,9 +675,11 @@ POST /resources
     ]
 }
 ```
-> `categoryIds` y `positionIds` son arrays de IDs. `complexityRefs` puede estar vacío `[]`.
+
+> `categoryIds` es un array de IDs. `positions` es un array de objetos con `positionId` y `participation`. `complexityRefs` puede estar vacío `[]`.
 
 **Respuesta `201`:**
+
 ```json
 {
     "id": 1,
@@ -611,11 +702,14 @@ POST /resources
             "icon": "video"
         }
     ],
-    "position": [
+    "resourcePositions": [
         {
             "id": 1,
-            "name": "Guion",
-            "participation": "Si"
+            "participation": "Si",
+            "position": {
+                "id": 1,
+                "name": "Guion"
+            }
         }
     ]
 }
@@ -623,45 +717,64 @@ POST /resources
 
 ---
 
-#### Obtener todos los recursos 🔒
+#### Obtener todos los recursos 👁
+
 ```
 GET /resources
 ```
+
 > Solo retorna recursos activos (no eliminados con soft delete).
 
 **Respuesta `200`:** Array de recursos con el mismo formato de arriba.
 
 ---
 
-#### Obtener un recurso por id 🔒
+#### Obtener un recurso por id 👁
+
 ```
 GET /resources/:id
 ```
+
 **Respuesta `200`:** Objeto recurso con el mismo formato de arriba.
 
 ---
 
 #### Actualizar un recurso 🔒
+
 ```
 PATCH /resources/:id
 ```
+
 **Body (todos los campos son opcionales):**
+
 ```json
 {
     "title": "Nuevo título",
     "hidden": true,
     "categoryIds": [1, 2],
-    "positionIds": [1, 2]
+    "positions": [
+        {
+            "positionId": 1,
+            "participation": "Depende"
+        },
+        {
+            "positionId": 2,
+            "participation": "No"
+        }
+    ]
 }
 ```
+
 **Respuesta `200`:** Objeto recurso actualizado.
 
 ---
 
 #### Eliminar un recurso (soft delete) 🔒
+
 ```
 DELETE /resources/:id
 ```
+
 > El recurso **no se borra** de la base de datos. Solo se marca con la fecha de eliminación en `deletedAt`. No aparecerá en el `GET /resources`.
 
 **Respuesta `204 No Content`**
@@ -669,9 +782,11 @@ DELETE /resources/:id
 ---
 
 #### Restaurar un recurso eliminado 🔒
+
 ```
 PATCH /resources/:id/restore
 ```
+
 > Restaura un recurso que fue eliminado con soft delete. Pone `deletedAt` en `null` nuevamente.
 
 **Respuesta `200`:** Objeto recurso restaurado.
@@ -679,12 +794,36 @@ PATCH /resources/:id/restore
 ---
 
 #### Alternar visibilidad de un recurso 🔒
+
 ```
 PATCH /resources/:id/visibility
 ```
+
 > Invierte el valor del campo `hidden`. Si estaba `true` pasa a `false` y viceversa.
 
 **Respuesta `200`:** Objeto recurso con el campo `hidden` invertido.
+
+---
+
+## Pruebas unitarias
+
+El proyecto incluye pruebas unitarias para todos los services usando **Jest** con el patrón **AAA (Arrange, Act, Assert)**.
+
+```bash
+# Correr todas las pruebas
+npm run test
+
+# Correr pruebas con cobertura
+npm run test:cov
+```
+
+| Archivo | Cobertura |
+|---|---|
+| `resources.service.spec.ts` | CRUD, soft delete, restore, toggleVisibility |
+| `categories.service.spec.ts` | CRUD completo |
+| `position.service.spec.ts` | CRUD completo |
+| `users.service.spec.ts` | CRUD, hash de contraseña, cambio de rol |
+| `auth.service.spec.ts` | Login exitoso, credenciales inválidas, generación de token |
 
 ---
 
@@ -713,6 +852,8 @@ PATCH /resources/:id/visibility
 | TypeScript | 5.7 |
 | JWT | @nestjs/jwt |
 | Bcrypt | bcrypt |
+| Swagger | @nestjs/swagger |
+| Jest | 30 |
 
 ---
 
