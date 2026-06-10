@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RoleEnum } from '../../common/enums/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -47,12 +48,19 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    reqUser: { role: RoleEnum },
+  ) {
     const user = await this.findOne(id);
-    const { roleId, ...rest } = updateUserDto;
+    const { roleId, password, ...rest } = updateUserDto;
 
-    if (roleId) {
-      const role = await this.roleRepository.findOne({ where: { id: roleId } });
+    if (roleId && reqUser.role === RoleEnum.ADMIN) {
+      const role = await this.roleRepository.findOne({
+        where: { id: roleId },
+      });
+
       if (!role) {
         throw new NotFoundException(`Role with id ${roleId} not found`);
       }
@@ -60,7 +68,18 @@ export class UsersService {
     }
 
     Object.assign(user, rest);
-    return await this.userRepository.save(user);
+
+    if (password?.trim()) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await this.userRepository.save(user);
+
+    return {
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role.name,
+    };
   }
 
   async remove(id: number): Promise<void> {

@@ -9,9 +9,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import {
-  ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
@@ -60,7 +61,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Roles(RoleEnum.ADMIN)
+  @Roles(RoleEnum.ADMIN, RoleEnum.USER)
   @Patch(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar un usuario' })
@@ -71,8 +72,9 @@ export class UsersController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request & { user?: any },
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto, req.user);
   }
 
   @Roles(RoleEnum.ADMIN)

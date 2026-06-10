@@ -28,7 +28,7 @@ import { RolesGuard } from './modules/auth/guards/role.guard';
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
         entities: [__dirname + '/modules/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     AuthModule,
